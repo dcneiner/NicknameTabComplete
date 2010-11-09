@@ -143,7 +143,7 @@
   $.fn.nicknameTabComplete = function (options) {
     options = $.extend({}, $.fn.nicknameTabComplete.defaults, options);
     return this.bind('keydown', function (e) {
-      onKeyPress(e, options);
+      onKeyPress.call(this, e, options);
     });
   };
   
