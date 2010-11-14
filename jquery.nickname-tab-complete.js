@@ -130,7 +130,7 @@
                if(match.value){
                  first = val.slice(0, sel.start - text.length );
                  last  = val.slice(sel.start);
-                 space = (last.length && last[0] == " ") ? "" : " ";
+                 space = (match.matches.length > 1 || last.length && last[0] == " ") ? "" : " ";
                  $this.val(first + match.value + space + last);
                  setCaretToPos(this, sel.start - text.length + match.value.length + space.length);
                }

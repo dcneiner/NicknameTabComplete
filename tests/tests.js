@@ -4,6 +4,8 @@ var ntc = $.fn.nicknameTabComplete,
     completed_1 = "This is some sample text that includes an @douglas symbol with a space.\n\nAnd an @lywithout a space.\n And finally, another @geo for testing.",
     completed_2 = "This is some sample text that includes an @doug symbol with a space.\n\nAnd an @LynnRegis without a space.\n And finally, another @geo for testing.",
     completed_3 = "This is some sample text that includes an @doug symbol with a space.\n\nAnd an @lywithout a space.\n And finally, another @GEORGE for testing.",
+    dont_add_space = "This is some sample text that includes an @doug",
+    dont_add_space_completed = "This is some sample text that includes an @douglas",
     end_of_text = "Sample @ly",
     end_of_text_completed = "Sample @LynnRegis ",
     no_letters = "@";
@@ -106,4 +108,9 @@ test("Unless a space already exists immediately following the carat position, on
   ntc.setCaretToPos(this.textarea, 10);
   trigger_tab.call(this);
   strictEqual(this.$textarea.val(), end_of_text_completed, "Should add space at end of text string");
+  
+  this.$textarea.val(dont_add_space);
+  ntc.setCaretToPos(this.textarea, 47);
+  trigger_tab.call(this);
+  strictEqual(this.$textarea.val(), dont_add_space_completed, "Should not add a space if there are more than one possible results.");
 });
