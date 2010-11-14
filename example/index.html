@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Nickname Tab Complete Example</title>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script src="../jquery.nickname-tab-complete.js"></script>
+	<script>
+	$(function () {
+	  $("textarea").nicknameTabComplete({ nicknames: ["dougneiner", "doug_neiner", "douglas", "LynnRegis", "hax0r", "steven", "stepHanie", "mixedCase", "0_leet"] });
+	});
+	</script>
+</head>
+<body>
+  <h1>Nickname Tab Complete Example</h1>
+  <h2>Acceptible nicknames:</h2>
+  <ul>
+    <li>dougneiner</li>
+    <li>doug_neiner</li>
+    <li>douglas</li>
+    <li>LynnRegis</li>
+    <li>hax0r</li>
+    <li>steven</li>
+    <li>stepHanie</li>
+    <li>mixedCase</li>
+    <li>0_leet</li>
+  </ul>
+  
+  <h2>Test in here:</h2>
+  <textarea rows="5" cols="40">Type a @ then some letters, then hit tab.
+    
+Like this: @lyn</textarea>
+</body>
+</html>
