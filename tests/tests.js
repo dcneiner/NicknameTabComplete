@@ -31,11 +31,7 @@ function matches(string) {
   return ntc.matchName(string, names).matches;  
 }
 
-module("Selection tests", {
-  setup: function () {
-    create_textarea.call(this);
-  }
-});
+module("Selection tests", { setup: create_textarea });
 
 test("Setting then retrieving the carat position should be accurate", function () {
   ntc.setCaretToPos(this.textarea, 47);
@@ -54,28 +50,31 @@ module("Nickname completion");
 
 test("When presented with enough characters for only one match, it should fully complete the name.", function () {
   equal(matchValue("ly"), "LynnRegis", "Should return full name");
-})
+});
 
-test("Even if case does not match, it should return the correctly cased completed nickname.", function () {
-  
+test("Even if case does not match, it should return the correctly cased completed nickname.", function () {  
+  expect(3);
   strictEqual(matchValue("lYN"), "LynnRegis", "Case should be correct.");
-  strictEqual(matchValue("DOUGLas_"), "douglas_neiner", "Case should be all lowercase.")
-  strictEqual(matchValue("g"), "GEORGE", "Case should be all uppercase.")
+  strictEqual(matchValue("DOUGLas_"), "douglas_neiner", "Case should be all lowercase.");
+  strictEqual(matchValue("g"), "GEORGE", "Case should be all uppercase.");
 });
 
 test("If two or more nicknames could match, returned value should included all letters up to the first different letter in the responses.", function () {
+  expect(2);
   equal(matchValue("da"), "dan", "Should complete up to first unique letter.");
-  equal(matchValue("dou"),"douglas", "Should complete up to the first unique letter.")
-})
+  equal(matchValue("dou"),"douglas", "Should complete up to the first unique letter.");
+});
 
 test("If two or more nicknames could match, all matches should be returned from the matchName function", function () {
   var _matches = matches("da");
+  expect(2);
   equal(_matches.length, 3, "Three results should have been returned.");
   strictEqual(_matches[2], "DAnger", "Results should contain original case.");
 });
 
 test("If no letters are present after the symbol, it should return all names", function () {
   var _matches = matches("");
+  expect(1);
   equal(_matches.length, names.length, "All names should have been returned");
 });
 
@@ -83,6 +82,8 @@ test("If no letters are present after the symbol, it should return all names", f
 module("Integration into textarea", {setup: create_textarea});
 
 test("If carat is preceeded by only a-z, -, or _ and then a @, it should attempt to complete the name", function (){
+  expect(2);
+  
   ntc.setCaretToPos(this.textarea, 47);
   trigger_tab.call(this);
   strictEqual(this.$textarea.val(), completed_1, "Should have completed douglas");
@@ -92,7 +93,7 @@ test("If carat is preceeded by only a-z, -, or _ and then a @, it should attempt
   ntc.setCaretToPos(this.textarea, 123);
   trigger_tab.call(this);
   strictEqual(this.$textarea.val(), completed_3, "Should have completed GEORGE");
-})
+});
 
 test("Unless a space already exists immediately following the carat position, one should be added, but only in the case of a complete match.", function () {
   ntc.setCaretToPos(this.textarea, 80);
@@ -113,4 +114,56 @@ test("Unless a space already exists immediately following the carat position, on
   ntc.setCaretToPos(this.textarea, 47);
   trigger_tab.call(this);
   strictEqual(this.$textarea.val(), dont_add_space_completed, "Should not add a space if there are more than one possible results.");
+});
+
+module("Custom events", { setup: create_textarea });
+
+test("When a match is triggered, it should fire a nickname-complete event and pass along the current value of the text as well as the matches.", function () {
+  stop();
+  expect(2);
+  this.$textarea.bind("nickname-complete", function (e) {
+    equals(e.value, "douglas", "Should match douglas");
+    equals(2, e.matches.length, "Should return two matches");
+    start();
+  });
+  
+  ntc.setCaretToPos(this.textarea, 47);
+  trigger_tab.call(this);
+});
+
+test("The event should be able to be bound during setup of the plugin", function () {
+  stop();
+  expect(3);
+  this.$textarea.remove();
+  create_textarea.call(this, { on_complete: function (e) {
+    ok(true, "Event was properly called.");
+    equals(e.value, "douglas", "Should match douglas");
+    equals(2, e.matches.length, "Should return two matches");
+    start();
+  } });
+  
+  ntc.setCaretToPos(this.textarea, 47);
+  trigger_tab.call(this);
+});
+
+test("If `preventDefault()` or `return false` is called on this custom event, then the match should not be made", function () {
+  expect(2);
+  
+  this.$textarea.bind("nickname-complete", function (e) {
+    e.preventDefault();
+  });
+  
+  ntc.setCaretToPos(this.textarea, 80);
+  trigger_tab.call(this);
+  strictEqual(this.$textarea.val(), sample, "Should still contain the original text.");
+  
+  this.$textarea.unbind("nickname-complete");
+  
+  this.$textarea.bind("nickname-complete", function () {
+    return false;
+  });
+  
+  ntc.setCaretToPos(this.textarea, 80);
+  trigger_tab.call(this);
+  strictEqual(this.$textarea.val(), sample, "Should still contain the original text.");
 });

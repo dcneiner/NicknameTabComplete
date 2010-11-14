@@ -120,14 +120,20 @@
             text = "",
             match = "", 
             first, 
-            last;
+            last,
+            completed_event;
 
         if (!sel.length && sel.start) {
             text = val.substr(0, sel.start);
             if (options.nick_match.test(text)) {
                text = text.match(options.nick_match)[1];
                match = matchName(text, options.nicknames);
-               if(match.value){
+               
+               completed_event = $.Event("nickname-complete");
+               $.extend(completed_event, match);
+               $this.trigger(completed_event);
+               
+               if(match.value && !completed_event.isDefaultPrevented()){
                  first = val.slice(0, sel.start - text.length );
                  last  = val.slice(sel.start);
                  /* Space should not be added when there is only 1 match
@@ -136,6 +142,7 @@
                  $this.val(first + match.value + space + last);
                  setCaretToPos(this, sel.start - text.length + match.value.length + space.length);
                }
+               
                e.preventDefault();
             }
         }
@@ -145,14 +152,19 @@
   
   $.fn.nicknameTabComplete = function (options) {
     options = $.extend({}, $.fn.nicknameTabComplete.defaults, options);
-    return this.bind('keydown', function (e) {
+    this.bind('keydown', function (e) {
       onKeyPress.call(this, e, options);
     });
+    if (options.on_complete !== null) {
+      this.bind('nickname-complete', options.on_complete);
+    }
+    return this;
   };
   
   $.fn.nicknameTabComplete.defaults = {
     nicknames: [],
-    nick_match: /@([-_a-z]*)$/i
+    nick_match: /@([-_a-z]*)$/i,
+    on_complete: null // Pass in a function as an alternate way of binding to this event
   };
   
   // These are exposed for testing
