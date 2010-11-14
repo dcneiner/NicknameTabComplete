@@ -1,14 +1,17 @@
 var ntc = $.fn.nicknameTabComplete,
-    names = ["douglasn", "benjamin", "LynnRegis", "douglas_neiner", "GEORGE", "daniel", "danny", "DAnger"],
+    names = ["douglasn", "benjamin", "LynnRegis", "douglas_neiner", "GEORGE", "daniel", "danny", "DAnger", "0_doug", "l33t"],
     sample = "This is some sample text that includes an @doug symbol with a space.\n\nAnd an @lywithout a space.\n And finally, another @geo for testing.",
     completed_1 = "This is some sample text that includes an @douglas symbol with a space.\n\nAnd an @lywithout a space.\n And finally, another @geo for testing.",
     completed_2 = "This is some sample text that includes an @doug symbol with a space.\n\nAnd an @LynnRegis without a space.\n And finally, another @geo for testing.",
     completed_3 = "This is some sample text that includes an @doug symbol with a space.\n\nAnd an @lywithout a space.\n And finally, another @GEORGE for testing.",
     dont_add_space = "This is some sample text that includes an @doug",
     dont_add_space_completed = "This is some sample text that includes an @douglas",
+    return_test = "This count\r\nbegins\r\nto @lyn",
+    return_test_completed = "This count\nbegins\nto @LynnRegis ",
     end_of_text = "Sample @ly",
     end_of_text_completed = "Sample @LynnRegis ",
-    no_letters = "@";
+    no_letters = "@",
+    new_line_bug = $.fn.nicknameTabComplete.has_newline_bug;
 
 function create_textarea(options) {
   this.$textarea = $("<textarea></textarea>").appendTo("#qunit-fixture");
@@ -34,16 +37,23 @@ function matches(string) {
 module("Selection tests", { setup: create_textarea });
 
 test("Setting then retrieving the caret position should be accurate", function () {
-  ntc.setCaretToPos(this.textarea, 47);
-  var values = ntc.getSelection(this.textarea);
+  ntc.setCaretToPos(this.textarea, 80);
+  var values = ntc.getSelection(this.textarea), expected = (new_line_bug ? 82 : 80);
   
-  expect(4);
+  expect(5);
+  
   
   equal(values.length, 0, "Length should be 0");
-  equal(values.start, 47, "Start should be at index 43");
-  equal(values.end, 47, "End should be at index 43");
+  equal(values.start, expected, "Start should be at index 80");
+  equal(values.end, expected, "End should be at index 80");
   
-  equal(this.$textarea.val().substr(0, 47), sample.substr(0,47), "First half of string should match sample string.");
+  equal(this.$textarea.val().substr(0, 80), sample.substr(0,80), "First half of string should match sample string.");
+  
+  this.$textarea.val(return_test);
+  
+  ntc.setCaretToPos(this.textarea, 27);
+  trigger_tab.call(this);
+  strictEqual(this.$textarea.val(), return_test_completed, "Completion should be accurate.");
 });
 
 module("Nickname completion");
@@ -76,6 +86,11 @@ test("If no letters are present after the symbol, it should return all names", f
   var _matches = matches("");
   expect(1);
   equal(_matches.length, names.length, "All names should have been returned");
+});
+
+test("Should match nicknames containing numbers", function () {
+  equal(matchValue("0"), "0_doug", "Should match a name starting with a number");
+  equal(matchValue("l3"), "l33t", "Should match a name containing a number");
 });
 
 

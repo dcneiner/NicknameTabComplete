@@ -56,3 +56,7 @@ By design this plugin will cancel default tab behavior **only** if the entry pas
 Copyright (c) 2010 by Doug Neiner
 
 Dual licensed under the MIT or GPL Version 2 licenses, same license as jQuery: http://jquery.org/license
+
+## Additional resources used:
+
+* Workaround for the Opera `tab` cancellation bug: http://www.webdeveloper.com/forum/showpost.php?p=806588&postcount=8

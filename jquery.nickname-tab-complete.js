@@ -70,6 +70,11 @@
   }
 
   function setCaretToPos(input, pos) {
+    // Fix for difference between normalized val() and value
+    if ($.fn.nicknameTabComplete.has_newline_bug) {
+      var adjustment = $(input).val().substr(0, pos).split(/\n/m).length - 1;
+      pos = pos + adjustment;
+    }
     setSelectionRange(input, pos, pos);
   }
   /* End functions from CMS */
@@ -124,6 +129,12 @@
             completed_event;
 
         if (!sel.length && sel.start) {
+            if($.fn.nicknameTabComplete.has_newline_bug) {
+              // Carriage return fix
+              text = this.value.substr(0, sel.start);
+              sel.start = sel.start - (text.split(/\r/).length - 1); 
+            }
+            
             text = val.substr(0, sel.start);
             if (options.nick_match.test(text)) {
                text = text.match(options.nick_match)[1];
@@ -135,8 +146,8 @@
                $this.trigger(completed_event);
                
                if(match.value && !completed_event.isDefaultPrevented()){
-                 first = val.slice(0, sel.start - text.length );
-                 last  = val.slice(sel.start);
+                 first = val.substr(0, sel.start - text.length );
+                 last  = val.substr(sel.start);
                  /* Space should not be added when there is only 1 match
                     or if there is already a space following the caret position */
                  space = (match.matches.length > 1 || last.length && last[0] == " ") ? "" : " ";
@@ -145,6 +156,9 @@
                }
                
                e.preventDefault();
+               
+               // Part of a crazy hack for Opera
+               this.lastKey = 9;
             }
         }
       }
@@ -153,9 +167,18 @@
   
   $.fn.nicknameTabComplete = function (options) {
     options = $.extend({}, $.fn.nicknameTabComplete.defaults, options);
-    this.bind('keydown', function (e) {
+    this.bind('keydown.nickname', function (e) {
       onKeyPress.call(this, e, options);
+    }).bind('focus.nickname', function () {
+      // Part of a crazy hack for Opera
+      this.lastKey = 0;
+    }).bind('blur.nickname', function () {
+      // Part of a crazy hack for Opera
+      if (this.lastKey === 9) {
+        this.focus();
+      }
     });
+    
     if (options.on_complete !== null) {
       this.bind('nickname-complete', options.on_complete);
     }
@@ -164,9 +187,14 @@
   
   $.fn.nicknameTabComplete.defaults = {
     nicknames: [],
-    nick_match: /@([-_a-z]*)$/i,
+    nick_match: /@([-_a-z0-9]*)$/i,
     on_complete: null // Pass in a function as an alternate way of binding to this event
   };
+  
+  $.fn.nicknameTabComplete.has_newline_bug = (function () {
+    var textarea = $("<textarea>").val("Newline\nTest");
+    return textarea[0].value === "Newline\r\nTest";
+  }());
   
   // These are exposed for testing
   // do not try to use as the API can
