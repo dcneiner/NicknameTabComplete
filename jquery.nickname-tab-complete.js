@@ -130,6 +130,8 @@
                if(match.value){
                  first = val.slice(0, sel.start - text.length );
                  last  = val.slice(sel.start);
+                 /* Space should not be added when there is only 1 match
+                    or if there is already a space following the carat position */
                  space = (match.matches.length > 1 || last.length && last[0] == " ") ? "" : " ";
                  $this.val(first + match.value + space + last);
                  setCaretToPos(this, sel.start - text.length + match.value.length + space.length);
