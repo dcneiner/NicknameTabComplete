@@ -34,6 +34,10 @@ function matches(string) {
   return ntc.matchName(string, names).matches;  
 }
 
+// test("splitting", function (){
+//   equal("\n\nhi\n".split("\n").length, 4);
+// });
+
 module("Selection tests", { setup: create_textarea });
 
 test("Setting then retrieving the caret position should be accurate", function () {

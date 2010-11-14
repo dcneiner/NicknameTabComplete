@@ -71,8 +71,9 @@
 
   function setCaretToPos(input, pos) {
     // Fix for difference between normalized val() and value
-    if ($.fn.nicknameTabComplete.has_newline_bug) {
-      var adjustment = $(input).val().substr(0, pos).split(/\n/m).length - 1;
+    // TODO: Need to fix IE test here and replace with support test
+    if ($.fn.nicknameTabComplete.has_newline_bug && !$.browser.msie) {
+      var adjustment = $(input).val().substr(0, pos).split("\n").length - 1;
       pos = pos + adjustment;
     }
     setSelectionRange(input, pos, pos);
@@ -132,7 +133,7 @@
             if($.fn.nicknameTabComplete.has_newline_bug) {
               // Carriage return fix
               text = this.value.substr(0, sel.start);
-              sel.start = sel.start - (text.split(/\r/).length - 1); 
+              sel.start = sel.start - (text.split("\n").length - 1); 
             }
             
             text = val.substr(0, sel.start);
