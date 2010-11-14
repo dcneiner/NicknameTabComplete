@@ -33,7 +33,7 @@ function matches(string) {
 
 module("Selection tests", { setup: create_textarea });
 
-test("Setting then retrieving the carat position should be accurate", function () {
+test("Setting then retrieving the caret position should be accurate", function () {
   ntc.setCaretToPos(this.textarea, 47);
   var values = ntc.getSelection(this.textarea);
   
@@ -81,7 +81,7 @@ test("If no letters are present after the symbol, it should return all names", f
 
 module("Integration into textarea", {setup: create_textarea});
 
-test("If carat is preceeded by only a-z, -, or _ and then a @, it should attempt to complete the name", function (){
+test("If caret is preceeded by only a-z, -, or _ and then a @, it should attempt to complete the name", function (){
   expect(2);
   
   ntc.setCaretToPos(this.textarea, 47);
@@ -95,7 +95,7 @@ test("If carat is preceeded by only a-z, -, or _ and then a @, it should attempt
   strictEqual(this.$textarea.val(), completed_3, "Should have completed GEORGE");
 });
 
-test("Unless a space already exists immediately following the carat position, one should be added, but only in the case of a complete match.", function () {
+test("Unless a space already exists immediately following the caret position, one should be added, but only in the case of a complete match.", function () {
   ntc.setCaretToPos(this.textarea, 80);
   trigger_tab.call(this);
   strictEqual(this.$textarea.val(), completed_2, "Should have completed LynnRegis and added a space.");
@@ -166,4 +166,17 @@ test("If `preventDefault()` or `return false` is called on this custom event, th
   ntc.setCaretToPos(this.textarea, 80);
   trigger_tab.call(this);
   strictEqual(this.$textarea.val(), sample, "Should still contain the original text.");
+});
+
+test("Event should provide accurate placement of the caret", function () {
+  expect(1);
+  
+  this.$textarea.bind("nickname-complete", function (e) {
+    equals(e.caret, 80, "caret position should current position.");
+    start();
+  });
+  
+  stop();
+  ntc.setCaretToPos(this.textarea, 80);
+  trigger_tab.call(this);
 });

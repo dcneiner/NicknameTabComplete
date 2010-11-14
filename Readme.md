@@ -20,10 +20,11 @@ I used code from all over, so I may need to play with the license, though all bo
 
 ## Custom Events
 
-This plugin will trigger a `nickname-complete` custom event whenever a matching attempt is made. It is possible to cancel the completion by calling `preventDefault()` on the event, or returning `false` from your handler. In addition to the normal values on the event object, two additional properties are added:
+This plugin will trigger a `nickname-complete` custom event whenever a matching attempt is made. It is possible to cancel the completion by calling `preventDefault()` on the event, or returning `false` from your handler. In addition to the normal values on the event object, three additional properties are added:
 
 * **value**: This is the current state of the completion. It will contain everything between the `@` and the end of the know letters of the nickname. If no match is found, this will be empty. If a partial match is found, this will contain that value.
 * **matches**: This is an array of the availible matches for the current event. If no matches were found, this will be an empty array. If a match was completed, this will contain only one value. If an attempted match matched multiple results, they will all be listed here.
+* **caret**: Position of the caret at the time the match was attempted. Does not reflect the new position after match.
 
 **Example:**
 
