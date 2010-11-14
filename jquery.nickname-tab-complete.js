@@ -90,7 +90,7 @@
       });
 
       if(matches.length === 1){
-          return matches[0];
+          return { value: matches[0], matches: matches };
       } else if (matches.length > 1) {
           for (; i < matches[0].length - length; i = i + 1) {
               letter = matches[0].toLowerCase().substr(length + i, 1);
@@ -107,9 +107,9 @@
                   break;
               }
           }
-          return input + letters;
+          return { value: input + letters, matches: matches };
       }
-      return "";
+      return { value: "", matches: matches };
   }
 
   function onKeyPress(e, options) {
@@ -127,11 +127,12 @@
             if (options.nick_match.test(text)) {
                text = text.match(options.nick_match)[1];
                match = matchName(text, options.nicknames);
-               if(match){
+               if(match.value){
                  first = val.slice(0, sel.start - text.length );
                  last  = val.slice(sel.start);
-                 $this.val(first + match + last);
-                 setCaretToPos(this, sel.start - text.length + match.length);
+                 space = (last.length && last[0] == " ") ? "" : " ";
+                 $this.val(first + match.value + space + last);
+                 setCaretToPos(this, sel.start - text.length + match.value.length + space.length);
                }
                e.preventDefault();
             }
@@ -151,5 +152,17 @@
     nicknames: [],
     nick_match: /@([-_a-z]*)$/i
   };
+  
+  // These are exposed for testing
+  // do not try to use as the API can
+  // change at any time
+  if (typeof window.QUnit !== "undefined") {
+    $.extend($.fn.nicknameTabComplete, {
+      getSelection: getSelection,
+      setSelectionRange: setSelectionRange,
+      setCaretToPos: setCaretToPos,
+      matchName: matchName
+    });
+  }
   
 }(jQuery));
