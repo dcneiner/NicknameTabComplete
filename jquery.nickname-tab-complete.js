@@ -1,5 +1,6 @@
 /*! 
  * Nickname Tab Complete
+ * Version: 0.8
  * 
  * Copyright (c) Doug Neiner, 2010
  * Dual licenses under MIT or GPL
