@@ -152,7 +152,7 @@
                  last  = val.substr(sel.start);
                  /* Space should not be added when there is only 1 match
                     or if there is already a space following the caret position */
-                 space = (match.matches.length > 1 || last.length && last[0] == " ") ? "" : " ";
+                 space = (match.matches.length > 1 || last.length && last.substr(0, 1) == " ") ? "" : " ";
                  $this.val(first + match.value + space + last);
                  setCaretToPos(this, sel.start - text.length + match.value.length + space.length);
                }
